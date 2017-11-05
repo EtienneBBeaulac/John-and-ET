@@ -45,6 +45,7 @@ void receive(int fd)
       type(filename);
       sleep(1);
       type("\nMission in progress");
+      sleep(4);
    }
 }
 
@@ -106,9 +107,9 @@ int main(void)
 
    sleep(1);
 
-   printf("Ending transmission...\n");
+   type("Ending transmission...");
    sleep(2);
-   printf("Good bye.\n");
+   type("\nGood bye.\n");
    // do {
    //    printf("What would you like to do?\n1. Receive an order\n2. Steal documents\n3. End Transmission\n\n");
    //    int result = scanf("%d", &prompt);

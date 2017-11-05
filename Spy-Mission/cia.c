@@ -6,19 +6,25 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <time.h>
 
 // tick
 #define FIFO_NAME "spy_mission"
 
+void type(char message[]);
+
 void order(int fd)
 {
    char order[256];
-   printf("\nEnter desired document name: ");
-   gets(order);
+   type("\nEnter desired document name: ");
+   // read_line(order, 256);
+   if (fgets(order, sizeof order, stdin)) {
+       order[strcspn(order, "\n")] = '\0';
+   }
    if (write(fd, order, strlen(order)) == -1)
       perror("write");
    else
-      printf("\nSent order to spy\n\n");
+      type("\nSent order to spy\n\n");
 }
 
 void receive(int fd)
@@ -30,9 +36,22 @@ void receive(int fd)
    else {
       message[num] = '\0';
       message[num - 1] = '\0';
-      printf("Receiving information...\n\n");
+      type("Receiving information...\n\n");
       sleep(2);
-      printf("Obtained information: \n\"%s\"\n\n", message);
+      type("Obtained information:\n");
+      type("\"");
+      type(message);
+      type("\"");
+   }
+}
+
+void type(char message[])
+{
+   for (int i = 0; i < strlen(message); i++)
+   {
+      printf("%c", message[i]);
+      fflush( stdout );
+      nanosleep((const struct timespec[]){{0, 20000000L}}, NULL);
    }
 }
 
@@ -43,15 +62,21 @@ int main(void)
 
    mknod(FIFO_NAME, S_IFIFO | 0666, 0);
 
-   printf("\nWaiting for spy...\n");
+   type("\nWaiting for spy...");
    fd = open(FIFO_NAME, O_RDWR);
-   printf("Connection established.\n");
+   sleep(3);
+   type("\nConnection established.\n");
+   sleep(1);
 
    do {
    order(fd);
    receive(fd);
-   printf("\nWhat would you like to do next:\n1. Send new order\n2. End transmission\n> ");
-   gets(message);
+   sleep(2);
+   type("\n\nWhat would you like to do next:\n1. Send new order\n2. End transmission\n> ");
+   if (fgets(message, sizeof message, stdin)) {
+       message[strcspn(message, "\n")] = '\0';
+   }
+   // read_line(message, 256);
    if (write(fd, message, strlen(message)) == -1)
       perror("write");
    close(fd);
@@ -60,9 +85,9 @@ int main(void)
 
    sleep(1);
 
-   printf("Ending transmission...\n");
+   type("Ending transmission...");
    sleep(2);
-   printf("Good bye.\n");
+   type("\nGood bye.\n");
 
    // char prompt[1];
    // do {
