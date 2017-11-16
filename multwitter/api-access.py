@@ -1,4 +1,10 @@
 from twython import Twython
+import json
 
 
-t = Twython(APP_KEY, access_token=ACCESS_TOKEN)
+with open('secret.json') as f:
+    data = json.load(f)
+
+twitter = Twython(data['APP_KEY'], data['APP_SECRET'])
+
+auth = twitter.get_authentication_tokens()
