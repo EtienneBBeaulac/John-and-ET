@@ -68,13 +68,14 @@ void steal(int fd, int success)
          type("\nSent mission report to CIA\n");
       sleep(1);
    }
-
+   
 }
 
 void type(char message[])
 {
    for (int i = 0; i < strlen(message); i++)
    {
+      printf("\033[1;32m");
       printf("%c", message[i]);
       fflush( stdout );
       nanosleep((const struct timespec[]){{0, 20000000L}}, NULL);
@@ -85,7 +86,7 @@ int main(void)
 {
    char message[256];
    int num, fd;
-
+   
    mknod(FIFO_NAME, S_IFIFO | 0666, 0);
    type("\nWaiting for response from the CIA...");
    // fd = open(FIFO_NAME, O_WRONLY);
@@ -94,22 +95,23 @@ int main(void)
    type("\nConnection established.");
    sleep(1);
    type("\n\nAwaiting orders...");
-
+   
    do {
-   receive(fd);
-   steal(fd, readFile());
-   type("\nAwaiting further instructions\n");
-   if ((num = read(fd, message, 256)) == -1)
-      perror("read");
-   close(fd);
-   fd = open(FIFO_NAME, O_RDWR);
+      receive(fd);
+      steal(fd, readFile());
+      type("\nAwaiting further instructions\n");
+      if ((num = read(fd, message, 256)) == -1)
+         perror("read");
+      close(fd);
+      fd = open(FIFO_NAME, O_RDWR);
    } while (0 != strncmp(message, "2", 1));
-
+   
    sleep(1);
-
-   type("Ending transmission...");
+   
+   type("\nEnding transmission...");
    sleep(2);
    type("\nGood bye.\n");
+   printf("\033[0m");
    // do {
    //    printf("What would you like to do?\n1. Receive an order\n2. Steal documents\n3. End Transmission\n\n");
    //    int result = scanf("%d", &prompt);
@@ -126,9 +128,9 @@ int main(void)
    //    else
    //       printf("Wrong entry.");
    // } while (prompt);
-
+   
    // readFile(filename);
-
+   
    // while (gets(message), !feof(stdin)) {
    //    if (!strncmp(message, "send", 4))
    //       if ((num = write(fd, contents, strlen(contents))) == -1)
@@ -138,6 +140,7 @@ int main(void)
    //    else
    //       printf("Wrong input\n");
    // }
-
+   
    return 0;
 }
+

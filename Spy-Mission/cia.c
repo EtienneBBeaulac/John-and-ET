@@ -49,6 +49,7 @@ void type(char message[])
 {
    for (int i = 0; i < strlen(message); i++)
    {
+   	printf("\033[1;32m");
       printf("%c", message[i]);
       fflush( stdout );
       nanosleep((const struct timespec[]){{0, 20000000L}}, NULL);
@@ -85,9 +86,10 @@ int main(void)
 
    sleep(1);
 
-   type("Ending transmission...");
+   type("\nEnding transmission...");
    sleep(2);
    type("\nGood bye.\n");
+    printf("\033[0m");
 
    // char prompt[1];
    // do {
