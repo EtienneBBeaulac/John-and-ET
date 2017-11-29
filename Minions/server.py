@@ -6,13 +6,12 @@ import os
 class Result(object):
 	pass
 
-def client_thread(clientsocket, address, filename):
+def client_thread(clientsocket, address, filename, result):
     print str(address) + " connected"
 
     clientsocket.send(filename)
     print "made it here"
-    m = clientsocket.recv(2048)
-    result.r = m
+    result.r = clientsocket.recv(2048)
 
     clientsocket.close()
 
@@ -31,11 +30,15 @@ if __name__ == '__main__':
     threads = []
     j = 0
     while True:
-        (clientsocket, address) = s.accept()
-        threads.append(Result())
-        thread.start_new_thread(client_thread, (clientsocket, address, filenames[j]))
+        if j < num_files:
+            (clientsocket, address) = s.accept()
+            threads.append(Result())
+            thread.start_new_thread(client_thread, (clientsocket, address, filenames[j], threads[-1]))
         j += 1
 
+        if j == num_files:
+            for result in threads:
+                print result.r
     # except Exception(e):
     #     print e
 
